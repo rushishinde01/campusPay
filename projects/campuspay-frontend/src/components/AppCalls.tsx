@@ -13,30 +13,39 @@ interface AppCallsInterface {
 
 const AppCalls = ({ openModal, setModalState }: AppCallsInterface) => {
   const [loading, setLoading] = useState<boolean>(false)
-  const [contractInput, setContractInput] = useState<string>('')
+  const [amountInput, setAmountInput] = useState<string>('200000')
+  const [receiverInput, setReceiverInput] = useState<string>('') // ✅ NEW
   const { enqueueSnackbar } = useSnackbar()
   const { transactionSigner, activeAddress } = useWallet()
 
   const algodConfig = getAlgodConfigFromViteEnvironment()
   const indexerConfig = getIndexerConfigFromViteEnvironment()
-  const algorand = AlgorandClient.fromConfig({
-    algodConfig,
-    indexerConfig,
-  })
+  const algorand = AlgorandClient.fromConfig({ algodConfig, indexerConfig })
   algorand.setDefaultSigner(transactionSigner)
 
   const sendAppCall = async () => {
+    if (!activeAddress) {
+      enqueueSnackbar('Please connect your wallet first.', { variant: 'warning' })
+      return
+    }
+
+    if (!receiverInput.trim()) {
+      enqueueSnackbar('Please enter a receiver address (must be different than your address).', { variant: 'warning' })
+      return
+    }
+
+    if (receiverInput.trim() === activeAddress) {
+      enqueueSnackbar('Receiver must be different than payer.', { variant: 'error' })
+      return
+    }
+
     setLoading(true)
 
-    // Please note, in typical production scenarios,
-    // you wouldn't want to use deploy directly from your frontend.
-    // Instead, you would deploy your contract on your backend and reference it by id.
-    // Given the simplicity of the starter contract, we are deploying it on the frontend
-    // for demonstration purposes.
     const factory = new CampusPayFactory({
-      defaultSender: activeAddress ?? undefined,
+      defaultSender: activeAddress,
       algorand,
     })
+
     const deployResult = await factory
       .deploy({
         onSchemaBreak: OnSchemaBreak.AppendApp,
@@ -48,46 +57,63 @@ const AppCalls = ({ openModal, setModalState }: AppCallsInterface) => {
         return undefined
       })
 
-    if (!deployResult) {
-      return
-    }
-
+    if (!deployResult) return
     const { appClient } = deployResult
 
-    const response = await appClient.send.hello({ args: { name: contractInput } }).catch((e: Error) => {
-      enqueueSnackbar(`Error calling the contract: ${e.message}`, { variant: 'error' })
-      setLoading(false)
-      return undefined
-    })
+    const amount = BigInt(amountInput)
 
-    if (!response) {
-      return
-    }
+    const response = await appClient.send
+      .createEscrow({
+        args: {
+          receiver: receiverInput.trim(),
+          amount,
+        },
+      })
+      .catch((e: Error) => {
+        enqueueSnackbar(`Error calling contract: ${e.message}`, { variant: 'error' })
+        setLoading(false)
+        return undefined
+      })
 
-    enqueueSnackbar(`Response from the contract: ${response.return}`, { variant: 'success' })
+    if (!response) return
+
+    enqueueSnackbar('Escrow created successfully!', { variant: 'success' })
     setLoading(false)
   }
 
   return (
     <dialog id="appcalls_modal" className={`modal ${openModal ? 'modal-open' : ''} bg-slate-200`}>
       <form method="dialog" className="modal-box">
-        <h3 className="font-bold text-lg">Say hello to your Algorand smart contract</h3>
+        <h3 className="font-bold text-lg">Create Escrow (CampusPay)</h3>
         <br />
+
+        {/* ✅ Receiver address input */}
         <input
           type="text"
-          placeholder="Provide input to hello function"
+          placeholder="Receiver address (must NOT be your address)"
           className="input input-bordered w-full"
-          value={contractInput}
-          onChange={(e) => {
-            setContractInput(e.target.value)
-          }}
+          value={receiverInput}
+          onChange={(e) => setReceiverInput(e.target.value)}
         />
-        <div className="modal-action ">
+
+        <br />
+        <br />
+
+        <input
+          type="number"
+          placeholder="Amount in microAlgos (e.g. 200000)"
+          className="input input-bordered w-full"
+          value={amountInput}
+          onChange={(e) => setAmountInput(e.target.value)}
+        />
+
+        <div className="modal-action">
           <button className="btn" onClick={() => setModalState(!openModal)}>
             Close
           </button>
-          <button className={`btn`} onClick={sendAppCall}>
-            {loading ? <span className="loading loading-spinner" /> : 'Send application call'}
+
+          <button className="btn" onClick={sendAppCall}>
+            {loading ? <span className="loading loading-spinner" /> : 'Create Escrow'}
           </button>
         </div>
       </form>
