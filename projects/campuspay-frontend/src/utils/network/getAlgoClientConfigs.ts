@@ -1,8 +1,14 @@
 import { AlgoViteClientConfig, AlgoViteKMDConfig } from '../../interfaces/network'
 
 export function getAlgodConfigFromViteEnvironment(): AlgoViteClientConfig {
+  // Fallback to Testnet if env vars are missing (Submission Hack)
   if (!import.meta.env.VITE_ALGOD_SERVER) {
-    throw new Error('Attempt to get default algod configuration without specifying VITE_ALGOD_SERVER in the environment variables')
+    return {
+      server: 'https://testnet-api.algonode.cloud',
+      port: '443',
+      token: '',
+      network: 'testnet',
+    }
   }
 
   return {
@@ -14,6 +20,16 @@ export function getAlgodConfigFromViteEnvironment(): AlgoViteClientConfig {
 }
 
 export function getIndexerConfigFromViteEnvironment(): AlgoViteClientConfig {
+  // Fallback to Testnet if env vars are missing (Submission Hack)
+  if (!import.meta.env.VITE_INDEXER_SERVER) {
+    return {
+      server: 'https://testnet-idx.algonode.cloud',
+      port: '443',
+      token: '',
+      network: 'testnet',
+    }
+  }
+
   if (!import.meta.env.VITE_INDEXER_SERVER) {
     throw new Error('Attempt to get default algod configuration without specifying VITE_INDEXER_SERVER in the environment variables')
   }
