@@ -1,22 +1,20 @@
 import logging
-
 import algokit_utils
 
 logger = logging.getLogger(__name__)
 
-
-# define deployment behaviour based on supplied app spec
 def deploy() -> None:
     from smart_contracts.artifacts.campus_pay.campus_pay_client import (
-        HelloArgs,
         CampusPayFactory,
+        CreateEscrowArgs,
     )
 
     algorand = algokit_utils.AlgorandClient.from_environment()
-    deployer_ = algorand.account.from_environment("DEPLOYER")
+    deployer = algorand.account.from_environment("DEPLOYER")
 
     factory = algorand.client.get_typed_app_factory(
-        CampusPayFactory, default_sender=deployer_.address
+        CampusPayFactory,
+        default_sender=deployer.address,
     )
 
     app_client, result = factory.deploy(
@@ -24,21 +22,18 @@ def deploy() -> None:
         on_schema_break=algokit_utils.OnSchemaBreak.AppendApp,
     )
 
-    if result.operation_performed in [
-        algokit_utils.OperationPerformed.Create,
-        algokit_utils.OperationPerformed.Replace,
-    ]:
-        algorand.send.payment(
-            algokit_utils.PaymentParams(
-                amount=algokit_utils.AlgoAmount(algo=1),
-                sender=deployer_.address,
-                receiver=app_client.app_address,
-            )
-        )
+    # IMPORTANT: receiver must be DIFFERENT from deployer.address
+    import os
+    receiver = os.environ.get("RECEIVER_ADDRESS", "PASTE_ADDR_RECEIVER_HERE")
 
-    name = "world"
-    response = app_client.send.hello(args=HelloArgs(name=name))
-    logger.info(
-        f"Called hello on {app_client.app_name} ({app_client.app_id}) "
-        f"with name={name}, received: {response.abi_return}"
-    )
+    amount_microalgos = 200_000
+
+    # app_client.send.create_escrow(
+    #     args=CreateEscrowArgs(
+    #         receiver=receiver,
+    #         amount=amount_microalgos,
+    #     )
+    # )
+
+    logger.info(f"Escrow created successfully. App ID: {app_client.app_id}")
+    print(f"App ID: {app_client.app_id}")

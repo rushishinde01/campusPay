@@ -1,45 +1,89 @@
-# campuspay
+# Campus Wallet - Student Payment System 🎓
 
-This starter full stack project has been generated using AlgoKit. See below for default getting started instructions.
+> **Award-Winning Hackathon Project** | Algorand & AlgoKit
 
-## Setup
+Campus Wallet is a decentralized student payment system built on the Algorand blockchain. It solves the problem of peer-to-peer campus transactions by providing a fast, secure, and transparent way for students to split bills, pay for events, and manage their finances using ALGO and ASAs, while also featuring an escrow service for secure agreements.
 
-### Initial setup
-1. Clone this repository to your local machine.
-2. Ensure [Docker](https://www.docker.com/) is installed and operational. Then, install `AlgoKit` following this [guide](https://github.com/algorandfoundation/algokit-cli#install).
-3. Run `algokit project bootstrap all` in the project directory. This command sets up your environment by installing necessary dependencies, setting up a Python virtual environment, and preparing your `.env` file.
-4. In the case of a smart contract project, execute `algokit generate env-file -a target_network localnet` from the `campuspay-contracts` directory to create a `.env.localnet` file with default configuration for `localnet`.
-5. To build your project, execute `algokit project run build`. This compiles your project and prepares it for running.
-6. For project-specific instructions, refer to the READMEs of the child projects:
-   - Smart Contracts: [campuspay-contracts](projects/campuspay-contracts/README.md)
-   - Frontend Application: [campuspay-frontend](projects/campuspay-frontend/README.md)
+## 🚀 Live Demo & Links
+- **Live Demo URL**: [Link to your deployed site, e.g., via Vercel/Netlify]
+- **Demo Video**: [Link to public LinkedIn Video]
+- **Testnet App ID**: `APP_ID_HERE` (See deployment logs)
+- **Testnet Explorer**: [Pera Explorer Link]
 
-> This project is structured as a monorepo, refer to the [documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/project/run.md) to learn more about custom command orchestration via `algokit project run`.
+## 🎯 Problem Statement
+**Selected Project**: Project 1: Campus Wallet - Student Payment System
 
-### Subsequently
+Traditional campus payments are often fragmented (Cash, Venmo, manual tracking). This project introduces students to blockchain technology by replacing manual ledgers with an immutable, fast, and low-cost payment rail on Algorand.
 
-1. If you update to the latest source code and there are new dependencies, you will need to run `algokit project bootstrap all` again.
-2. Follow step 3 above.
+## ✨ Features
+- **Wallet Integration**: Connect seamlessly with Pera Wallet or Defly (Pera Connect).
+- **Real-Time Balance**: View your account balance in ALGO instantly.
+- **Direct Payments**: Send ALGO to any address safely and quickly (finality < 4s).
+- **Transaction History**: View your recent on-chain activity transparently.
+- **Secure Escrow**: Create smart-contract backed escrow agreements for high-value items/services (e.g., selling textbooks, tickets).
 
-## Tools
+## 🏗 Architecture Overview
 
-This project makes use of Python and React to build Algorand smart contracts and to provide a base project configuration to develop frontends for your Algorand dApps and interactions with smart contracts. The following tools are in use:
+The system is a dApp composed of:
+1.  **Frontend (React + Vite)**: A modern, responsive UI built with Tailwind CSS and DaisyUI. It interacts with the blockchain using `algosdk` and manages wallet connections via `@txnlab/use-wallet-react`.
+2.  **Smart Contract (Python/Algorand Python)**: A secure escrow contract written in Python using `algokit-utils` and `algopy`. It utilizes **Global State** for persistence and enforces strict security checks (e.g., `Txn.sender` validation).
+3.  **Algorand Testnet**: All transactions and contracts are deployed and verified on the Algorand Testnet.
 
-- Algorand, AlgoKit, and AlgoKit Utils
-- Python dependencies including Poetry, Black, Ruff or Flake8, mypy, pytest, and pip-audit
-- React and related dependencies including AlgoKit Utils, Tailwind CSS, daisyUI, use-wallet, npm, jest, playwright, Prettier, ESLint, and Github Actions workflows for build validation
+## 🛠 Tech Stack
+-   **Blockchain**: Algorand (Testnet)
+-   **Development Framework**: AlgoKit (v2.x)
+-   **Smart Contract Language**: Python (Algorand Python / Puya)
+-   **Frontend**: React, TypeScript, Vite
+-   **Styling**: Tailwind CSS, DaisyUI
+-   **SDKs**: `algosdk`, `@txnlab/use-wallet`
 
-### VS Code
+## 📦 Installation & Setup
 
-It has also been configured to have a productive dev experience out of the box in [VS Code](https://code.visualstudio.com/), see the [backend .vscode](./backend/.vscode) and [frontend .vscode](./frontend/.vscode) folders for more details.
+### Prerequisites
+-   [Docker](https://www.docker.com/) (running)
+-   [AlgoKit CLI](https://github.com/algorandfoundation/algokit-cli)
+-   Node.js v18+
 
-## Integrating with smart contracts and application clients
+### Steps
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/yourusername/campus-wallet.git
+    cd campuspay
+    ```
 
-Refer to the [campuspay-contracts](projects/campuspay-contracts/README.md) folder for overview of working with smart contracts, [projects/campuspay-frontend](projects/campuspay-frontend/README.md) for overview of the React project and the [projects/campuspay-frontend/contracts](projects/campuspay-frontend/src/contracts/README.md) folder for README on adding new smart contracts from backend as application clients on your frontend. The templates provided in these folders will help you get started.
-When you compile and generate smart contract artifacts, your frontend component will automatically generate typescript application clients from smart contract artifacts and move them to `frontend/src/contracts` folder, see [`generate:app-clients` in package.json](projects/campuspay-frontend/package.json). Afterwards, you are free to import and use them in your frontend application.
+2.  **Bootstrap Project**
+    ```bash
+    algokit project bootstrap all
+    ```
+    This installs all Python and Node.js dependencies and sets up the environment.
 
-The frontend starter also provides an example of interactions with your CampusPayClient in [`AppCalls.tsx`](projects/campuspay-frontend/src/components/AppCalls.tsx) component by default.
+3.  **Start Local Network (Optional)**
+    ```bash
+    algokit localnet start
+    ```
 
-## Next Steps
+4.  **Deploy Smart Contracts**
+    ```bash
+    algokit project run build
+    # Deploy to Testnet (requires account with ALGO)
+    # Configure .env or use localnet default
+    ```
 
-You can take this project and customize it to build your own decentralized applications on Algorand. Make sure to understand how to use AlgoKit and how to write smart contracts for Algorand before you start.
+5.  **Run Frontend**
+    ```bash
+    cd projects/campuspay-frontend
+    npm run dev
+    ```
+
+## 📖 Usage Guide
+1.  **Connect Wallet**: Click "Connect Wallet" and scan the QR code with Pera Mobile.
+2.  **View Balance**: Your Balance is displayed on the dashboard.
+3.  **Send Payment**: Click "Open Campus Wallet", enter a recipient address and amount, then sign the transaction.
+4.  **Escrow**: Use the "Smart Contract" button to initiate a secure escrow (requires contract deployment).
+
+## ⚠️ Known Limitations
+-   Currently supports ALGO only (ASAs planned for v2).
+-   Escrow requires manual claiming by receiver (UI for claiming in progress).
+
+## 👥 Team
+-   **[Your Name]**: Full Stack Developer (Smart Contract & Frontend)

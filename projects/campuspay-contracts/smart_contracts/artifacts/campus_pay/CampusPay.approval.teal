@@ -1,0 +1,214 @@
+#pragma version 11
+#pragma typetrack false
+
+// algopy.arc4.ARC4Contract.approval_program() -> uint64:
+main:
+    intcblock 0 1
+    bytecblock "is_active" "is_claimed" "payer" "receiver" "amount"
+    txn ApplicationID
+    bnz main_after_if_else@2
+    // smart_contracts/campus_pay/contract.py:8-10
+    // # initialize global state keys
+    // # storing addresses as bytes (32 bytes)
+    // self.payer = GlobalState(Bytes())
+    bytec_2 // "payer"
+    pushbytes 0x
+    app_global_put
+    // smart_contracts/campus_pay/contract.py:11
+    // self.receiver = GlobalState(Bytes())
+    bytec_3 // "receiver"
+    pushbytes 0x
+    app_global_put
+    // smart_contracts/campus_pay/contract.py:12
+    // self.amount = GlobalState(UInt64(0))
+    bytec 4 // "amount"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/campus_pay/contract.py:13
+    // self.is_active = GlobalState(UInt64(0))
+    bytec_0 // "is_active"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/campus_pay/contract.py:14
+    // self.is_claimed = GlobalState(UInt64(0))
+    bytec_1 // "is_claimed"
+    intc_0 // 0
+    app_global_put
+
+main_after_if_else@2:
+    // smart_contracts/campus_pay/contract.py:5
+    // class CampusPay(ARC4Contract):
+    txn NumAppArgs
+    bz main___algopy_default_create@12
+    txn OnCompletion
+    !
+    assert
+    txn ApplicationID
+    assert
+    pushbytess 0xb62d2f7c 0x39cae816 0xa3bbe9fb // method "create_escrow(address,uint64)void", method "claim_escrow()void", method "cancel_escrow()void"
+    txna ApplicationArgs 0
+    match create_escrow claim_escrow cancel_escrow
+    err
+
+main___algopy_default_create@12:
+    txn OnCompletion
+    !
+    txn ApplicationID
+    !
+    &&
+    return
+
+
+// smart_contracts.campus_pay.contract.CampusPay.create_escrow[routing]() -> void:
+create_escrow:
+    // smart_contracts/campus_pay/contract.py:16
+    // @abimethod()
+    txna ApplicationArgs 1
+    dup
+    len
+    pushint 32
+    ==
+    assert // invalid number of bytes for arc4.static_array<arc4.uint8, 32>
+    txna ApplicationArgs 2
+    dup
+    len
+    pushint 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    // smart_contracts/campus_pay/contract.py:18
+    // assert self.is_active.value == UInt64(0)
+    intc_0 // 0
+    bytec_0 // "is_active"
+    app_global_get_ex
+    assert // check self.is_active exists
+    !
+    assert
+    // smart_contracts/campus_pay/contract.py:19
+    // assert amount > UInt64(0)
+    dup
+    assert
+    // smart_contracts/campus_pay/contract.py:21-22
+    // # Payer is the transaction sender
+    // payer = Txn.sender
+    txn Sender
+    // smart_contracts/campus_pay/contract.py:23
+    // assert payer != receiver
+    dup
+    dig 3
+    !=
+    assert
+    // smart_contracts/campus_pay/contract.py:25
+    // self.payer.value = payer.bytes
+    bytec_2 // "payer"
+    swap
+    app_global_put
+    // smart_contracts/campus_pay/contract.py:26
+    // self.receiver.value = receiver.bytes
+    bytec_3 // "receiver"
+    uncover 2
+    app_global_put
+    // smart_contracts/campus_pay/contract.py:27
+    // self.amount.value = amount
+    bytec 4 // "amount"
+    swap
+    app_global_put
+    // smart_contracts/campus_pay/contract.py:28
+    // self.is_active.value = UInt64(1)
+    bytec_0 // "is_active"
+    intc_1 // 1
+    app_global_put
+    // smart_contracts/campus_pay/contract.py:29
+    // self.is_claimed.value = UInt64(0)
+    bytec_1 // "is_claimed"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/campus_pay/contract.py:16
+    // @abimethod()
+    intc_1 // 1
+    return
+
+
+// smart_contracts.campus_pay.contract.CampusPay.claim_escrow[routing]() -> void:
+claim_escrow:
+    // smart_contracts/campus_pay/contract.py:33
+    // assert self.is_active.value == UInt64(1)
+    intc_0 // 0
+    bytec_0 // "is_active"
+    app_global_get_ex
+    assert // check self.is_active exists
+    intc_1 // 1
+    ==
+    assert
+    // smart_contracts/campus_pay/contract.py:34
+    // assert self.is_claimed.value == UInt64(0)
+    intc_0 // 0
+    bytec_1 // "is_claimed"
+    app_global_get_ex
+    assert // check self.is_claimed exists
+    !
+    assert
+    // smart_contracts/campus_pay/contract.py:36-37
+    // # Only the designated receiver can claim
+    // assert Txn.sender.bytes == self.receiver.value
+    txn Sender
+    intc_0 // 0
+    bytec_3 // "receiver"
+    app_global_get_ex
+    assert // check self.receiver exists
+    ==
+    assert
+    // smart_contracts/campus_pay/contract.py:39
+    // self.is_claimed.value = UInt64(1)
+    bytec_1 // "is_claimed"
+    intc_1 // 1
+    app_global_put
+    // smart_contracts/campus_pay/contract.py:40
+    // self.is_active.value = UInt64(0)
+    bytec_0 // "is_active"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/campus_pay/contract.py:31
+    // @abimethod()
+    intc_1 // 1
+    return
+
+
+// smart_contracts.campus_pay.contract.CampusPay.cancel_escrow[routing]() -> void:
+cancel_escrow:
+    // smart_contracts/campus_pay/contract.py:44
+    // assert self.is_active.value == UInt64(1)
+    intc_0 // 0
+    bytec_0 // "is_active"
+    app_global_get_ex
+    assert // check self.is_active exists
+    intc_1 // 1
+    ==
+    assert
+    // smart_contracts/campus_pay/contract.py:45
+    // assert self.is_claimed.value == UInt64(0)
+    intc_0 // 0
+    bytec_1 // "is_claimed"
+    app_global_get_ex
+    assert // check self.is_claimed exists
+    !
+    assert
+    // smart_contracts/campus_pay/contract.py:47-48
+    // # Only the original payer can cancel
+    // assert Txn.sender.bytes == self.payer.value
+    txn Sender
+    intc_0 // 0
+    bytec_2 // "payer"
+    app_global_get_ex
+    assert // check self.payer exists
+    ==
+    assert
+    // smart_contracts/campus_pay/contract.py:50
+    // self.is_active.value = UInt64(0)
+    bytec_0 // "is_active"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/campus_pay/contract.py:42
+    // @abimethod()
+    intc_1 // 1
+    return
