@@ -30,7 +30,7 @@ const itemVariants: Variants = {
     visible: { opacity: 1, y: 0 },
 }
 
-export function ActionDock({ theme, onReceive, onPay, onEscrow }: ActionDockProps) {
+export function ActionDock({ theme, onReceive, onPay, onEscrow, onManage }: ActionDockProps) {
     const isDark = theme === "dark"
 
     // Pay Button Styles (Primary)

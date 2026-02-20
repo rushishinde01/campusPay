@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { X, Settings, Download, RefreshCcw, Loader2, Trash2 } from "lucide-react"
+import { X, Settings, Download, RefreshCcw, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { useWallet } from '@txnlab/use-wallet-react'
 import { useSnackbar } from 'notistack'
@@ -110,26 +110,6 @@ export function ManageEscrowModal({ isOpen, onClose }: ManageEscrowModalProps) {
         }
     }
 
-    const handleDelete = async () => {
-        if (!appId || !activeAddress) return
-        setLoading(true)
-        try {
-            const factory = new CampusPayFactory({
-                defaultSender: activeAddress,
-                algorand,
-            })
-            const appClient = factory.getAppClientById({ appId: BigInt(appId) })
-
-            await appClient.send.delete.bare()
-
-            enqueueSnackbar("Contract Deleted!", { variant: 'success' })
-            onClose()
-        } catch (e: any) {
-            enqueueSnackbar(`Delete Failed: ${e.message}`, { variant: 'error' })
-        } finally {
-            setLoading(false)
-        }
-    }
 
     return (
         <AnimatePresence>
@@ -238,16 +218,6 @@ export function ManageEscrowModal({ isOpen, onClose }: ManageEscrowModalProps) {
                                                     className="w-full bg-red-600 hover:bg-red-500 text-white font-medium py-3 rounded-lg flex items-center justify-center gap-2 transition-all"
                                                 >
                                                     <RefreshCcw className="h-4 w-4" /> Refund Payer
-                                                </button>
-                                            )}
-
-                                            {!appState.isActive && (
-                                                <button
-                                                    onClick={handleDelete}
-                                                    disabled={loading}
-                                                    className="w-full bg-white/10 hover:bg-red-900/50 text-white/70 font-medium py-3 rounded-lg flex items-center justify-center gap-2 transition-all"
-                                                >
-                                                    <Trash2 className="h-4 w-4" /> Delete Contract
                                                 </button>
                                             )}
                                         </div>
