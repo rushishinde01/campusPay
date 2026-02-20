@@ -1,13 +1,14 @@
 "use client"
 
 import { motion, Variants } from "framer-motion"
-import { ArrowUpRight, QrCode, Shield } from "lucide-react"
+import { ArrowUpRight, QrCode, Shield, Settings } from "lucide-react"
 
 interface ActionDockProps {
     theme: "light" | "dark"
     onReceive: () => void
     onPay: () => void
     onEscrow: () => void
+    onManage: () => void
 }
 
 const dockVariants: Variants = {
@@ -98,6 +99,23 @@ export function ActionDock({ theme, onReceive, onPay, onEscrow }: ActionDockProp
                 </div>
                 <span className={`text-[10px] font-medium uppercase tracking-[0.2em] ${labelColor}`}>
                     Escrow
+                </span>
+            </motion.button>
+
+            {/* Manage */}
+            <motion.button
+                variants={itemVariants}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onManage}
+                className="group flex flex-col items-center gap-3"
+                aria-label="Manage"
+            >
+                <div className={`flex h-16 w-16 items-center justify-center rounded-full border ${secBorder} bg-transparent transition-all duration-300 opacity-50 hover:opacity-100`}>
+                    <Settings className={`h-6 w-6 ${secIcon}`} strokeWidth={1.5} />
+                </div>
+                <span className={`text-[10px] font-medium uppercase tracking-[0.2em] ${labelColor}`}>
+                    Manage
                 </span>
             </motion.button>
         </motion.div>

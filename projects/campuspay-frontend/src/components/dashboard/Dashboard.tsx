@@ -12,6 +12,7 @@ import { ThemeToggle } from "./ThemeToggle"
 import { ReceiveModal } from "./ReceiveModal"
 import { TransactionList, Transaction } from "./TransactionList"
 import { SendModal } from "./SendModal"
+import { ManageEscrowModal } from "./ManageEscrowModal"
 
 interface DashboardProps {
     onEscrowClick: () => void
@@ -25,6 +26,7 @@ export function Dashboard({ onEscrowClick, onWalletClick }: DashboardProps) {
     // UI State
     const [receiveOpen, setReceiveOpen] = useState(false)
     const [sendOpen, setSendOpen] = useState(false)
+    const [manageOpen, setManageOpen] = useState(false)
 
     // Data State
     const [balance, setBalance] = useState<string>("0.00")
@@ -181,6 +183,7 @@ export function Dashboard({ onEscrowClick, onWalletClick }: DashboardProps) {
                     onReceive={() => setReceiveOpen(true)}
                     onPay={() => setSendOpen(true)}
                     onEscrow={onEscrowClick}
+                    onManage={() => setManageOpen(true)}
                 />
                 <TransactionList transactions={transactions} theme={theme} />
             </section>
@@ -196,6 +199,10 @@ export function Dashboard({ onEscrowClick, onWalletClick }: DashboardProps) {
                 onClose={() => setSendOpen(false)}
                 onSend={handleSend}
                 isLoading={loading}
+            />
+            <ManageEscrowModal
+                isOpen={manageOpen}
+                onClose={() => setManageOpen(false)}
             />
         </main>
     )
